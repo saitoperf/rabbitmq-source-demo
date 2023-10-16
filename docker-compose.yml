@@ -1,0 +1,14 @@
+version: '3'
+services:
+  my-queue:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    expose:
+    - '5672:5672'
+    network_mode: host
+    environment:
+    - RABBITMQ_DEFAULT_USER=admin
+    - RABBITMQ_DEFAULT_PASS=P@ssw0rd
+    - RABBITMQ_LOGS=/var/log/rabbitmq/rabbitmq.log
+    # volumes:
+    # - ./logs/:/var/log/rabbitmq/rabbitmq.log

@@ -1,0 +1,19 @@
+apiVersion: sources.knative.dev/v1alpha1
+kind: RabbitmqSource
+metadata:
+  name: n2fn-rabbitmq-source
+spec:
+  rabbitmqClusterReference:
+    namespace: default
+    connectionSecret:
+      name: rabbit-auth
+  rabbitmqResourcesConfig:
+    exchangeName: " "
+    queueName: "up" # rabbitMQ内の監視するキューの名前
+  sink: # 次にイベントを送る場所(今回は直接ファンクションを指定)
+    ref:
+      kind: Service
+      apiVersion: serving.knative.dev/v1
+      name: n2fn
+      namespace: default
+
