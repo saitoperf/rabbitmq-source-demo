@@ -1,4 +1,4 @@
-i# Build the manager binary
+# Build the manager binary
 FROM registry.cn-hangzhou.aliyuncs.com/knative-sample/golang:1.13-alpine3.10 as builder
 
 # Copy in the go src
