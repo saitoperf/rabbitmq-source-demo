@@ -1,13 +1,26 @@
+# metadata:
+#   name: n2fn
+#   namespace: default
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - image: docker.io/shiron228/n2fn
+
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: n2fn
+  name: event-display
   namespace: default
+  labels:
+    app: event-display
 spec:
   template:
     metadata:
       annotations:
         autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/target: "500"
     spec:
       containers:
-      - image: docker.io/shiron228/n2fn
+      - image: docker.io/shiron228/event-display
+      # - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display

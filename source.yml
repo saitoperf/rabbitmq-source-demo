@@ -1,19 +1,23 @@
 apiVersion: sources.knative.dev/v1alpha1
 kind: RabbitmqSource
 metadata:
-  name: n2fn-rabbitmq-source
+  name: source
 spec:
   rabbitmqClusterReference:
     namespace: default
     connectionSecret:
       name: rabbit-auth
   rabbitmqResourcesConfig:
+    parallelism: 10
     exchangeName: " "
     queueName: "up" # rabbitMQ内の監視するキューの名前
+  delivery:
+    retry: 5
+    backoffPolicy: "linear"
+    backoffDelay: "PT1S"
   sink: # 次にイベントを送る場所(今回は直接ファンクションを指定)
     ref:
       kind: Service
       apiVersion: serving.knative.dev/v1
-      name: n2fn
+      name: event-display
       namespace: default
-
