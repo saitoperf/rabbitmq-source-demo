@@ -22,5 +22,5 @@ spec:
         autoscaling.knative.dev/target: "500"
     spec:
       containers:
-      - image: docker.io/shiron228/event-display
-      # - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
+      # - image: docker.io/shiron228/event-display
+      - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display

@@ -1,9 +1,18 @@
 # knative-source
+## インストール
 ```sh
+# Start Rabbitmq container
 docker compose up -d
-kubectl delete -f service.yml ; kubectl delete -f source.yml ; \
-kubectl apply -f service.yml && kubectl apply -f source.yml
-time ./client.py 500
+# Build event-display
+cd event-display
+./build <container registry> # ex) ./build.sh docker.io/shiron228/event-display
+cd ../
+# Apply source & service
+./exe.sh
+# Push 500 requests to Rabbitmq
+./client.py 500
+```
+
 
 # 500個のfnが起動していることを確認
 kubectl logs  `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep Hello | wc -l

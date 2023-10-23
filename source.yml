@@ -8,7 +8,7 @@ spec:
     connectionSecret:
       name: rabbit-auth
   rabbitmqResourcesConfig:
-    parallelism: 10
+    parallelism: 1000
     exchangeName: " "
     queueName: "up" # rabbitMQ内の監視するキューの名前
   delivery:
