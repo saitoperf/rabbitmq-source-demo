@@ -1,0 +1,19 @@
+apiVersion: sources.knative.dev/v1beta1
+kind: KafkaSource
+
+metadata:
+  name: source
+  namespace: default
+spec:
+  # consumerGroup: knative-group
+  bootstrapServers:
+  - 172.16.1.5:9092
+  consumers: 5
+  topics:
+  - test
+  sink:
+    ref:
+      kind: Service
+      apiVersion: serving.knative.dev/v1
+      name: event-display
+      namespace: default
