@@ -3,154 +3,154 @@
   gather_facts: yes
 
   tasks:
-  - name: apt install package
-    apt:
-      name: docker.io
-  - name: add docker group
-    user:
-      name: "{{ ansible_user }}"
-      state: present
-      groups:
-      - docker
-      append: yes
+#   - name: apt install package
+#     apt:
+#       name: docker.io
+#   - name: add docker group
+#     user:
+#       name: "{{ ansible_user }}"
+#       state: present
+#       groups:
+#       - docker
+#       append: yes
 
-  - name: snap install package
-    snap:
-      name: kubectl
-      classic: yes
+#   - name: snap install package
+#     snap:
+#       name: kubectl
+#       classic: yes
 
-  - name: pip3 install package
-    pip:
-      name: kubernetes
-      executable: pip3
+#   - name: pip3 install package
+#     pip:
+#       name: kubernetes
+#       executable: pip3
 
-  - name: install minikube
-    get_url:
-      url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-      dest: /usr/local/bin/minikube
-      owner: root
-      group: root
-      mode: "755"
+#   - name: install minikube
+#     get_url:
+#       url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+#       dest: /usr/local/bin/minikube
+#       owner: root
+#       group: root
+#       mode: "755"
     
-  # minikubeの構築
-  - name: delete minikube
-    command: minikube delete
-  - name: set 10G memory
-    command: minikube config set memory 10240
-  - name: set 4 vcpus
-    command: minikube config set cpus 4
-  - name: start minikube
-    command: minikube start --kubernetes-version=v1.26.3
-    become: true
-    become_user: "{{ ansible_user }}"
+#   # minikubeの構築
+#   - name: delete minikube
+#     command: minikube delete
+#   - name: set 25G memory
+#     command: minikube config set memory 25600
+#   - name: set  vcpus
+#     command: minikube config set cpus 16
+#   - name: start minikube
+#     command: minikube start --kubernetes-version=v1.26.3
+#     become: true
+#     become_user: "{{ ansible_user }}"
 
-# https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
+# # https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
 
-  # knative serving
-  - name: apply serving-crds
-    k8s:
-      src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-crds.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  - name: apply serving-core
-    k8s: 
-      src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-core.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  - name: apply kourier
-    k8s:
-      src: https://github.com/knative/net-kourier/releases/download/knative-v1.11.1/kourier.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
+#   # knative serving
+#   - name: apply serving-crds
+#     k8s:
+#       src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-crds.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   - name: apply serving-core
+#     k8s: 
+#       src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-core.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   - name: apply kourier
+#     k8s:
+#       src: https://github.com/knative/net-kourier/releases/download/knative-v1.11.1/kourier.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
   
-  # - name: knative serving, patch
-  #   k8s:
-  #     kind: configmap/config-network
-  #     namespace: knative-serving
-  #     merge_type: merge
-  #     state: patched
-  #     patch:
-  #     - op: 
-  #       path: ./patch.json
-  #   become: true
-  #   become_user: "{{ ansible_user }}"
-  # 後でモジュールを使った方法にする
-  - name: patch configmap/config-network
-    command: kubectl patch configmap/config-network -n knative-serving --type merge --patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
-    become: true
-    become_user: "{{ ansible_user }}"
+#   # - name: knative serving, patch
+#   #   k8s:
+#   #     kind: configmap/config-network
+#   #     namespace: knative-serving
+#   #     merge_type: merge
+#   #     state: patched
+#   #     patch:
+#   #     - op: 
+#   #       path: ./patch.json
+#   #   become: true
+#   #   become_user: "{{ ansible_user }}"
+#   # 後でモジュールを使った方法にする
+#   - name: patch configmap/config-network
+#     command: kubectl patch configmap/config-network -n knative-serving --type merge --patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+#     become: true
+#     become_user: "{{ ansible_user }}"
   
-  - name: apply serving-default-domain
-    k8s:
-      src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-default-domain.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
+#   - name: apply serving-default-domain
+#     k8s:
+#       src: https://github.com/knative/serving/releases/download/knative-v1.11.0/serving-default-domain.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
   
-  - name: minikube tunnel
-    shell: nohup minikube tunnel &
-    become: true
-    become_user: "{{ ansible_user }}"
+#   - name: minikube tunnel
+#     shell: nohup minikube tunnel &
+#     become: true
+#     become_user: "{{ ansible_user }}"
 
-  # knative eventing
-  - name: apply eventing-crds
-    k8s:
-      src: https://github.com/knative/eventing/releases/download/knative-v1.11.1/eventing-crds.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  - name: apply eventing-core
-    k8s:
-      src: https://github.com/knative/eventing/releases/download/knative-v1.11.1/eventing-core.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
+#   # knative eventing
+#   - name: apply eventing-crds
+#     k8s:
+#       src: https://github.com/knative/eventing/releases/download/knative-v1.11.1/eventing-crds.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   - name: apply eventing-core
+#     k8s:
+#       src: https://github.com/knative/eventing/releases/download/knative-v1.11.1/eventing-core.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
   
-  # RabbitMQ source
-  - name: apply cluster-operator
-    k8s:
-      src: https://github.com/rabbitmq/cluster-operator/releases/download/v2.1.0/cluster-operator.yml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  # install cert-manager
-  - name: apply cert-manager
-    k8s:
-      # src: https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
-      src: https://github.com/cert-manager/cert-manager/releases/download/v1.5.4/cert-manager.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  # ここダサい
-  - name: sleep 80s
-    pause:
-      seconds: 80
-  - name: apply messaging-topology-operator-with-certmanager
-    k8s:
-      src: https://github.com/rabbitmq/messaging-topology-operator/releases/download/v1.10.0/messaging-topology-operator-with-certmanager.yaml
-      apply: yes
-      # wait: yes
-      # wait_sleep: 5
-    become: true
-    become_user: "{{ ansible_user }}"
-  - name: apply rabbitmq-source
-    k8s:
-      src: https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-v1.11.3/rabbitmq-source.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
-  - name: apply rabbitmq-broker
-    k8s:
-      src: https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-v1.11.3/rabbitmq-broker.yaml
-      apply: yes
-    become: true
-    become_user: "{{ ansible_user }}"
+#   # RabbitMQ source
+#   - name: apply cluster-operator
+#     k8s:
+#       src: https://github.com/rabbitmq/cluster-operator/releases/download/v2.1.0/cluster-operator.yml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   # install cert-manager
+#   - name: apply cert-manager
+#     k8s:
+#       # src: https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+#       src: https://github.com/cert-manager/cert-manager/releases/download/v1.5.4/cert-manager.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   # ここダサい
+#   - name: sleep 80s
+#     pause:
+#       seconds: 80
+#   - name: apply messaging-topology-operator-with-certmanager
+#     k8s:
+#       src: https://github.com/rabbitmq/messaging-topology-operator/releases/download/v1.10.0/messaging-topology-operator-with-certmanager.yaml
+#       apply: yes
+#       # wait: yes
+#       # wait_sleep: 5
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   - name: apply rabbitmq-source
+#     k8s:
+#       src: https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-v1.11.3/rabbitmq-source.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
+#   - name: apply rabbitmq-broker
+#     k8s:
+#       src: https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-v1.11.3/rabbitmq-broker.yaml
+#       apply: yes
+#     become: true
+#     become_user: "{{ ansible_user }}"
   - name: apply rabbit-auth
     k8s:
-      src: /home/{{ ansible_user }}/proc5gc/n1n2fn/cmd/n2fn/rabbit-auth.yml
+      src: /home/{{ ansible_user }}/knative-source/rabbitmq/auth.yml
       apply: yes
     become: true
     become_user: "{{ ansible_user }}"
@@ -160,7 +160,7 @@
       seconds: 10
   - name: apply rabbitmqCluster.yml
     k8s:
-      src: /home/{{ ansible_user }}/proc5gc/n1n2fn/cmd/n2fn/broker_trigger/rabbitmqCluster.yml
+      src: /home/{{ ansible_user }}/knative-source/rabbitmq/broker/rabbitmqCluster.yml
       apply: yes
     become: true
     become_user: "{{ ansible_user }}"

@@ -2,14 +2,20 @@
 ## インストールと実行
 - knative環境の構築
 ```sh
-cd ansible
-sudo pip3 install ansible-core==2.12.3
+# localhostに公開鍵認証できるようにする
+ssh-keygen
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys 
+# ansibleのインストール
+sudo apt update
+sudo apt install python3-pip
+sudo pip3 install ansible-core==2.15.5
 ansible-galaxy collection install community.docker
 ansible-galaxy collection install community.general
 ansible-galaxy collection install kubernetes.core
 # 上記のコマンドは一回実行すればOK
 # 下記のコマンドは環境を作り直したいときに都度実行
 rm ~/.ssh/known_hosts
+# knative-source/rabbitmq/ansible
 ansible-playbook -i inventory.yml -bK play-knative.yml
 ```
 - その他の環境構築 (pwd: knative-source)
