@@ -34,8 +34,10 @@ cd ../
 ## 確認
 ```sh
 # 500個のfnが起動していることを確認
-kubectl logs  `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | wc -l
-kubectl logs -l app=event-display-00001 | grep UTC | sed -n '1p;$p'
+kubectl logs `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | wc -l
+kubectl logs `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | sed -n '1p;$p'
+# kubectl logs -l app=event-display-00001 | grep UTC | sed -n '1p;$p'
+while true; do  kubectl logs  `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | wc -l; sleep 1; done;
 
 # sourceが受け取ったリクエストの数(どっちも同じ)
 kubectl logs  `kubectl get po | grep source | cut -f 1 -d ' '` | grep -e Received | wc -l

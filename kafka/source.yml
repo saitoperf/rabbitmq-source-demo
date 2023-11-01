@@ -8,7 +8,7 @@ spec:
   # consumerGroup: knative-group
   bootstrapServers:
   - 172.16.1.5:9092
-  consumers: 5
+  consumers: 10
   topics:
   - test
   sink:

@@ -19,8 +19,8 @@ if __name__ == '__main__':
         channel.basic_publish(exchange='', routing_key='up', body='Hello World!')
         # time.sleep(0.01)
         # print(" [x] Sent 'Hello World!'", datetime.datetime.now())
-        # if i == 0:
-        #     print(" [x] Sent 'Hello World!'", datetime.datetime.now())
-        # if i == n-1:
-        #     print(" [x] Sent 'Hello World!'", datetime.datetime.now())
+        if i == 0:
+            print(" [x] Sent 'Hello World!'", datetime.datetime.now())
+        if i == n-1:
+            print(" [x] Sent 'Hello World!'", datetime.datetime.now())
     connection.close()

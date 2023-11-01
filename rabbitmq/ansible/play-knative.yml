@@ -65,7 +65,19 @@
       apply: yes
     become: true
     become_user: "{{ ansible_user }}"
-
+  
+  # - name: knative serving, patch
+  #   k8s:
+  #     kind: configmap/config-network
+  #     namespace: knative-serving
+  #     merge_type: merge
+  #     state: patched
+  #     patch:
+  #     - op: 
+  #       path: ./patch.json
+  #   become: true
+  #   become_user: "{{ ansible_user }}"
+  # 後でモジュールを使った方法にする
   - name: patch configmap/config-network
     command: kubectl patch configmap/config-network -n knative-serving --type merge --patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
     become: true
@@ -120,6 +132,8 @@
     k8s:
       src: https://github.com/rabbitmq/messaging-topology-operator/releases/download/v1.10.0/messaging-topology-operator-with-certmanager.yaml
       apply: yes
+      # wait: yes
+      # wait_sleep: 5
     become: true
     become_user: "{{ ansible_user }}"
   - name: apply rabbitmq-source
@@ -128,9 +142,31 @@
       apply: yes
     become: true
     become_user: "{{ ansible_user }}"
+  - name: apply rabbitmq-broker
+    k8s:
+      src: https://github.com/knative-sandbox/eventing-rabbitmq/releases/download/knative-v1.11.3/rabbitmq-broker.yaml
+      apply: yes
+    become: true
+    become_user: "{{ ansible_user }}"
   - name: apply rabbit-auth
     k8s:
-      src: /home/{{ ansible_user }}/knative-source/auth.yml
+      src: /home/{{ ansible_user }}/proc5gc/n1n2fn/cmd/n2fn/rabbit-auth.yml
       apply: yes
+    become: true
+    become_user: "{{ ansible_user }}"
+  
+  - name: sleep 10s
+    pause:
+      seconds: 10
+  - name: apply rabbitmqCluster.yml
+    k8s:
+      src: /home/{{ ansible_user }}/proc5gc/n1n2fn/cmd/n2fn/broker_trigger/rabbitmqCluster.yml
+      apply: yes
+    become: true
+    become_user: "{{ ansible_user }}"
+
+  # k8sモジュールが何故か使えないのでcommnadモジュールを使っている
+  - name: apply https://github.com/knative/eventing/releases/download/knative-v1.11.1/in-memory-channel.yaml
+    command: "kubectl apply -f https://github.com/knative/eventing/releases/download/knative-v1.11.1/in-memory-channel.yaml"
     become: true
     become_user: "{{ ansible_user }}"

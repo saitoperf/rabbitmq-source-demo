@@ -1,0 +1,14 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: trigger
+  annotations:
+    rabbitmq.eventing.knative.dev/parallelism: "1000"
+spec:
+  broker: rabbitmq-broker
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
+      namespace: default

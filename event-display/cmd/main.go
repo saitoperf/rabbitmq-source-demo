@@ -28,7 +28,7 @@ type eventData struct {
 
 func receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
 	log.Printf("%s\n", time.Now())
-	time.Sleep(1000 * time.Millisecond)
+	// time.Sleep(1000 * time.Millisecond)
 	// fmt.Printf("☁️ %s cloudevents.Event\n%s", event.String(), time.Now())
 
 	return nil
