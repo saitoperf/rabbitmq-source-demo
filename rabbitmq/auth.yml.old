@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbit-auth
+  namespace: default
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: UEBzc3cwcmQ=
+  # ここだけ変える
+  uri: MTkyLjE2OC4yLjEy
+
+
+# username: admin
+# password: P@ssw0rd
+# uri: 172.16.1.50
+# echo -n "172.16.1.50" | openssl base64
+  # MTcyLjE2LjEuNQ==

@@ -31,10 +31,10 @@
 # minikubeの構築
 - name: delete minikube
   command: minikube delete
-- name: set 25G memory
-  command: minikube config set memory 25600
-- name: set  vcpus
-  command: minikube config set cpus 16
+- name: set memory
+  command: minikube config set memory 10000
+- name: set vcpus
+  command: minikube config set cpus 4
 - name: start minikube
   command: minikube start --kubernetes-version=v1.26.3
   become: true

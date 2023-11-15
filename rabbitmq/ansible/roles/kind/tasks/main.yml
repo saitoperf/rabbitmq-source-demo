@@ -24,15 +24,22 @@
 
 - name: go install sigs.k8s.io/kind@v0.20.0
   command: go install sigs.k8s.io/kind@v0.20.0
+  become: true
+  become_user: "{{ ansible_user }}"
 
 - name: copy /home/{{ ansible_user }}/go/bin/kind to /usr/local/bin
   copy:
     src: /home/{{ ansible_user }}/go/bin/kind
     dest: /usr/local/bin/kind
     remote_src: true
+    mode: "0755"
 
 - name: kind delete cluster
   command: kind delete cluster
+  become: true
+  become_user: "{{ ansible_user }}"
 
 - name: kind create cluster
   command: kind create cluster --config config.yml
+  become: true
+  become_user: "{{ ansible_user }}"
