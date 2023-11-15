@@ -1,0 +1,38 @@
+---
+- name: apt install package
+  apt:
+    name: docker.io
+- name: add docker group
+  user:
+    name: "{{ ansible_user }}"
+    state: present
+    groups:
+    - docker
+    append: yes
+
+- name: snap install package
+  snap:
+    name:
+    - kubectl
+    - go
+    classic: yes
+
+- name: copy config.yml
+  copy:
+    src: config.yml
+    dest: ./
+
+- name: go install sigs.k8s.io/kind@v0.20.0
+  command: go install sigs.k8s.io/kind@v0.20.0
+
+- name: copy /home/{{ ansible_user }}/go/bin/kind to /usr/local/bin
+  copy:
+    src: /home/{{ ansible_user }}/go/bin/kind
+    dest: /usr/local/bin/kind
+    remote_src: true
+
+- name: kind delete cluster
+  command: kind delete cluster
+
+- name: kind create cluster
+  command: kind create cluster --config config.yml

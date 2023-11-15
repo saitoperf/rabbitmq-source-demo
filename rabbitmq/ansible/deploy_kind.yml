@@ -1,0 +1,7 @@
+---
+- name: kind
+  hosts: local
+  become: yes
+  roles:
+  - { role: kind, tags: kind }
+  - { role: knative, tags: knative }

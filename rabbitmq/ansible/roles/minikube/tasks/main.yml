@@ -1,0 +1,41 @@
+---
+- name: apt install package
+  apt:
+    name: docker.io
+- name: add docker group
+  user:
+    name: "{{ ansible_user }}"
+    state: present
+    groups:
+    - docker
+    append: yes
+
+- name: snap install package
+  snap:
+    name: kubectl
+    classic: yes
+
+- name: pip3 install package
+  pip:
+    name: kubernetes
+    executable: pip3
+
+- name: install minikube
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    owner: root
+    group: root
+    mode: "755"
+  
+# minikubeの構築
+- name: delete minikube
+  command: minikube delete
+- name: set 25G memory
+  command: minikube config set memory 25600
+- name: set  vcpus
+  command: minikube config set cpus 16
+- name: start minikube
+  command: minikube start --kubernetes-version=v1.26.3
+  become: true
+  become_user: "{{ ansible_user }}"

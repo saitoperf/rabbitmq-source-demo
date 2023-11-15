@@ -1,0 +1,7 @@
+---
+- name: minikube
+  hosts: local
+  become: yes
+  roles:
+  - { role: minikube, tags: minikube }
+  - { role: knative, tags: knative }
