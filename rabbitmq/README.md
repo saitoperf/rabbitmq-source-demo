@@ -1,60 +1,55 @@
 # knative-source
-## インストールと実行
-- knative環境の構築
-```sh
-# localhostに公開鍵認証できるようにする
-ssh-keygen
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys 
-rm ~/.ssh/known_hosts
-# ansibleのインストール
-sudo apt update
-sudo apt install python3-pip -y
-sudo pip3 install ansible-core==2.15.5
-pip3 install pika
-ansible-galaxy collection install community.docker
-ansible-galaxy collection install community.general
-ansible-galaxy collection install kubernetes.core
-# 上記のコマンドは一回実行すればOK
-# 下記のコマンドは環境を作り直したいときに都度実行
-# knative-source/rabbitmq/ansible
-ansible-playbook -i inventory.yml -bK deploy_minikube.yml
-```
-- rabbitmq関連 (pwd: knative-source)
-```sh
-# Start Rabbitmq container
+## Required
+- kind
+
+## Install
+```bash
+# Start kind
+kind create cluster --config kind_config.yml
+# Install knative operator
+kubectl apply -f https://github.com/knative/operator/releases/download/knative-v1.12.2/operator.yaml
+# Install knative-serving & knative-eventing
+kubectl apply -f install/
+# Start rabbitmq container
 docker compose up -d
-```
-- その他の環境構築 (pwd: knative-source)
-```sh
-# Build event-display & push container registry
-cd event-display
-./build <container registry> # ex) ./build.sh docker.io/shiron228/event-display
-cd ../
-# ここで、service.ymlのspec.template.spec.container[].imageにコンテナレジストリを指定してください！
-# Apply knative-source & knative-service
-./exe.sh    # secretの「--from-literal=uri=192.168.2.12」を自分のIPに編集する
-```
-- 実行
-```sh
-# Push 500 requests to Rabbitmq
-./client.py 500
+# Please replace x.x.x.x with the IP address of your host machine
+# ex) sed 's/uri: .*/uri: '$(echo -n "192.168.1.11" | openssl base64)'/' rabbit-auth.yml | kubectl apply -f -
+sed 's/uri: .*/uri: '$(echo -n "x.x.x.x" | openssl base64)'/' rabbit-auth.yml | kubectl apply -f -
+# Install rabbitmq source
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.5.4/cert-manager.yaml
+kubectl apply -f https://github.com/rabbitmq/messaging-topology-operator/releases/download/v1.10.0/messaging-topology-operator-with-certmanager.yaml
+kubectl apply -f service.yml
+kubectl apply -f source.yml
 ```
 
-## 確認
+- Push 500 requests to RabbitMQ
 ```sh
-# 500個のfnが起動していることを確認
+sudo apt install python3-pika
+time ./client.py 500
+```
+
+## Build event-display & push container registry
+```sh
+cd event-display
+./build [container registry] # ex) ./build.sh docker.io/shiron228/event-display
+cd ../
+# Please specify the container registry in spec.template.spec.container[].image in service.yml
+```
+
+## Verify
+```sh
+# Confirm that 500 fn are activated
 kubectl logs `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | wc -l
 kubectl logs `kubectl get po | grep event-display | cut -f 1 -d ' '` | grep UTC | sed -n '1p;$p'
-# kubectl logs -l app=event-display-00001 | grep UTC | sed -n '1p;$p'
 
-# sourceが受け取ったリクエストの数(どっちも同じ)
+# Number of requests received by source
 kubectl logs  `kubectl get po | grep source | cut -f 1 -d ' '` | grep -e Received | wc -l
 kubectl logs  `kubectl get po | grep source | cut -f 1 -d ' '` | grep -e Successfully | wc -l
 
-# 最初と最後のリクエストの時間差
+# Time difference between first and last request
 kubectl logs  `kubectl get po | grep source | cut -f 1 -d ' '` | grep -e Received | sed -n '1p;$p'
 kubectl logs  `kubectl get po | grep source | cut -f 1 -d ' '` | grep -e Successfully | sed -n '1p;$p'
 
-# rabbitmqの状態の監視
+# Monitoring rabbitmq status
 watch -n 0.1 docker exec -it rabbitmq rabbitmqctl list_queues
 ```

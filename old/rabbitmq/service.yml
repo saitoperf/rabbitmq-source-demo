@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+  namespace: default
+  labels:
+    app: event-display
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+        # autoscaling.knative.dev/target: "500"
+    spec:
+      containers:
+      - image: docker.io/shiron228/event-display
+      # - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
+      containerConcurrency: 500

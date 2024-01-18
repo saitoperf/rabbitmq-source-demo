@@ -1,7 +1,10 @@
 ---
 - name: apt install package
   apt:
-    name: docker.io
+    name: 
+    - docker.io
+    - pipx
+    - python3-kubernetes 
 - name: add docker group
   user:
     name: "{{ ansible_user }}"
@@ -14,11 +17,6 @@
   snap:
     name: kubectl
     classic: yes
-
-- name: pip3 install package
-  pip:
-    name: kubernetes
-    executable: pip3
 
 - name: install minikube
   get_url:

@@ -7,6 +7,7 @@ import sys
 
 if __name__ == '__main__':
     credentials = pika.PlainCredentials('admin', 'P@ssw0rd')
+    # credentials = pika.PlainCredentials('saito', 'pass')
     connection = pika.BlockingConnection(
         pika.ConnectionParameters('localhost', 5672, '/', credentials)
     )
