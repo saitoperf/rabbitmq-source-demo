@@ -9,13 +9,13 @@ spec:
     connectionSecret:
       name: rabbit-auth
   rabbitmqResourcesConfig:
-    parallelism: 1000
+    parallelism: 500
     exchangeName: " "
     queueName: "up" # rabbitMQ内の監視するキューの名前
-  delivery:
-    retry: 5
-    backoffPolicy: "linear"
-    backoffDelay: "PT1S"
+  # delivery:
+  #   retry: 5
+  #   backoffPolicy: "linear"
+  #   backoffDelay: "PT1S"
   sink: # 次にイベントを送る場所(今回は直接ファンクションを指定)
     ref:
       kind: Service

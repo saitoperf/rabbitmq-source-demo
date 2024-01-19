@@ -13,6 +13,7 @@ spec:
         # autoscaling.knative.dev/target: "500"
     spec:
       containers:
-      - image: docker.io/shiron228/event-display
+      # - image: docker.io/shiron228/event-display:with
+      - image: docker.io/shiron228/event-display:without
       # - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
       containerConcurrency: 500
