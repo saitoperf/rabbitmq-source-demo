@@ -23,10 +23,10 @@ $(DOCKER_CONFIG)/cli-plugins/docker-compose:
 	chmod +x $@
 
 .PHONY: all-minikube
-all-minikube: kubectl minikube knative rabbitmq rabbitmq-auth certmanager rabbitmq-source service-source ## Install all minikube ver. ex) make all-minikube IP=x.x.x.x
+all-minikube: kubectl minikube knative certmanager rabbitmq-source rabbitmq rabbitmq-auth service-source ## Install all minikube ver. ex) make all-minikube IP=x.x.x.x
 
 .PHONY: all-kind
-all-kind: kubectl kind knative rabbitmq rabbitmq-auth certmanager rabbitmq-source service-source ## Install all kind ver. ex) make all-minikube IP=x.x.x.x
+all-kind: kubectl kind knative certmanager rabbitmq-source rabbitmq rabbitmq-auth service-source ## Install all kind ver. ex) make all-minikube IP=x.x.x.x
 
 # https://minikube.sigs.k8s.io/docs/start/
 /usr/local/bin/minikube:
@@ -54,6 +54,8 @@ kind: /usr/local/bin/kind ## Start kind cluster
 knative: ## Install knative-serving & knative-eventing
 	kubectl apply -f https://github.com/knative/operator/releases/download/knative-v1.12.2/operator.yaml
 	kubectl apply -f install/
+	kubectl rollout status -n knative-serving deployment
+	kubectl rollout status -n knative-eventing deployment
 
 .PHONY: rabbitmq
 rabbitmq: $(DOCKER_CONFIG)/cli-plugins/docker-compose ## Start RabbitMQ container
@@ -67,17 +69,15 @@ rabbitmq-auth: ## Create rabbitmq auth. ex) make rabbitmq-auth IP=x.x.x.x
 .PHONY: certmanager
 certmanager: ## Install cert-manager
 	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.5.4/cert-manager.yaml
+	kubectl rollout status -n cert-manager deployment
 
 .PHONY: rabbitmq-source
 rabbitmq-source: certmanager ## Install RabbitMQ source
-	kubectl rollout status -n cert-manager deploy/cert-manager
-	kubectl rollout status -n cert-manager deploy/cert-manager-cainjector
-	kubectl rollout status -n cert-manager deploy/cert-manager-webhook
 	kubectl apply -f https://github.com/rabbitmq/messaging-topology-operator/releases/download/v1.10.0/messaging-topology-operator-with-certmanager.yaml
+	kubectl rollout status -n rabbitmq-system deploy/messaging-topology-operator
 
 .PHONY: service-source
 service-source: ## Deploy service & source
-	kubectl rollout status -n rabbitmq-system deploy/messaging-topology-operator
 	kubectl apply -f service.yml
 	kubectl apply -f source.yml
 

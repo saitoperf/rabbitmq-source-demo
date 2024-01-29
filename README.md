@@ -1,4 +1,5 @@
-# knative-source
+# rabbitmq-source-demo
+
 ## Quick Start
 - Install
   - Replace x.x.x.x to IP address of your host
